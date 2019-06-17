@@ -1,0 +1,32 @@
+{
+  "name": "cncnet-map-downloader.js",
+  "version": "1.0.0",
+  "description": "Downloads all maps from cncnet",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/danmindru/cncnet-map-downloader.js.git"
+  },
+  "keywords": [
+    "cncnet",
+    "yuri",
+    "red",
+    "alert",
+    "2",
+    "yuri's",
+    "revenge",
+    "maps",
+    "yrm",
+    "ra2",
+    "yr"
+  ],
+  "author": "Dan Mindru",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/danmindru/cncnet-map-downloader.js/issues"
+  },
+  "homepage": "https://github.com/danmindru/cncnet-map-downloader.js#readme"
+}
