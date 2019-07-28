@@ -4,7 +4,8 @@
   "description": "Downloads all maps from cncnet",
   "main": "index.js",
   "scripts": {
-    "download": "GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js"
+    "download": "RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
+    "publish:all": "./node_modules/.bin/pkg ./scripts/get-maps.js --out-path packages"
   },
   "repository": {
     "type": "git",
@@ -32,8 +33,9 @@
   "dependencies": {
     "axios": "^0.19.0",
     "chalk": "^2.4.2",
-    "lzo": "^0.4.11",
+    "pkg": "^4.3.7",
     "request": "^2.88.0",
+    "sanitize-filename": "^1.6.2",
     "unzipper": "^0.10.1"
   }
 }
