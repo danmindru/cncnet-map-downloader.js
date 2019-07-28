@@ -11,6 +11,11 @@ Double-click your favorite executable (win, mac, linux).
 - By default, it only downloads Yuri (yr) maps, but can be configured to download other types.
 - If the process is somehow killed, it will resume downloading maps that haven't been downloaded yet.
 
+| Windows preview | Mac preview |
+|---|---|
+| <img src="https://user-images.githubusercontent.com/1515742/62007911-7d0e4580-b153-11e9-9417-1ea40231db6a.jpg" width="500px" /> | <img src="https://user-images.githubusercontent.com/1515742/62007905-623bd100-b153-11e9-93c9-3b388a7c8170.png" width="500px" /> |
+
+
 #### Build it yourself
 Clone the repo, then run `npm install`. <br/>
 You can start a download with `npm run download`. Downloads can be configured in `package.json` under scripts.
