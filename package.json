@@ -4,7 +4,7 @@
   "description": "Downloads all maps from cncnet",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "download": "GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js"
   },
   "repository": {
     "type": "git",
@@ -28,5 +28,12 @@
   "bugs": {
     "url": "https://github.com/danmindru/cncnet-map-downloader.js/issues"
   },
-  "homepage": "https://github.com/danmindru/cncnet-map-downloader.js#readme"
+  "homepage": "https://github.com/danmindru/cncnet-map-downloader.js#readme",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "chalk": "^2.4.2",
+    "lzo": "^0.4.11",
+    "request": "^2.88.0",
+    "unzipper": "^0.10.1"
+  }
 }
