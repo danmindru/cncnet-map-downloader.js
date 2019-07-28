@@ -1,3 +1,5 @@
+[![npm](https://img.shields.io/npm/v/cncnet-map-downloader.js.svg)](https://www.npmjs.com/package/cncnet-map-downloader.js)
+
 # cncnet-map-downloader.js
 Downloads all maps from [cncnet.org](https://cncnet.org) into a directory of your choice.
 
