@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "download": "RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
-    "publish:all": "./node_modules/.bin/pkg ./scripts/get-maps.js --out-path packages"
+    "publish:all": "node package.js"
   },
   "repository": {
     "type": "git",
