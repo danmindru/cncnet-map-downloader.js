@@ -1,6 +1,6 @@
 {
   "name": "cncnet-map-downloader.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Downloads all maps from cncnet",
   "main": "index.js",
   "scripts": {
