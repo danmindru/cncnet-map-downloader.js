@@ -10,13 +10,13 @@ if (!fs.existsSync(packageDir)) {
 }
 
 const packageCode = async () => {
-  await exec([entry, '--target', targets[0], '--output', `${packageDir}/${name}-linux-${version}`]);
+  await exec([entry, '--target', targets[0], '--output', `${packageDir}/${name}-${version}-linux`]);
   console.log(`Packaged for linux`);
 
-  await exec([entry, '--target', targets[1], '--output', `${packageDir}/${name}-macos-${version}`]);
+  await exec([entry, '--target', targets[1], '--output', `${packageDir}/${name}-${version}-macos`]);
   console.log(`Packaged for mac`);
 
-  await exec([entry, '--target', targets[2], '--output', `${packageDir}/${name}-windows-${version}.exe`]);
+  await exec([entry, '--target', targets[2], '--output', `${packageDir}/${name}-${version}-windows.exe`]);
   console.log(`Packaged for windows`);
 };
 
