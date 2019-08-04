@@ -109,7 +109,7 @@ const main = async () => {
     console.warn('Scarping not implemented. Usig cncnet search-json url to list all maps.');
   }
 
-  await axios.get(`https://mapdb.cncnet.org/search-json.php?game=${gameType}&age=12`).then((res) => {
+  await axios.get(`https://mapdb.cncnet.org/search-json.php?game=${gameType}`).then((res) => {
     const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
     const mapRequests = res.data.filter(filterByExistingMaps(destinationDirFilelist)).map(unzipAsync);
     const filesSkipped = res.data.length - mapRequests.length - 1;
