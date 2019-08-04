@@ -4,7 +4,7 @@
 Downloads all maps from [cncnet.org](https://cncnet.org) into a directory of your choice.
 
 ### Usage
-Grab the latest binary release on [the release page](https://github.com/DHI/html-import-updater/releases) 💽.
+Grab the latest binary release on [the release page](https://github.com/danmindru/cncnet-map-downloader.js/releases) 💽.
 
 Double-click your favorite executable (win, mac, linux).
 
