@@ -1,19 +1,9 @@
 const axios = require('axios');
 const fs = require('fs');
-const request = require('request');
-const unzipper = require('unzipper');
 const chalk = require('chalk');
-const path = require('path');
-const sanitize = require('sanitize-filename');
 
-const shouldScrape = process.env.FORCE_SCAPE;
-const gameType = process.env.GAME_TYPE || 'yr';
-const mapAge = process.env.MAP_AGE || null;
-const destinationDir = process.env.DESTINATION_DIR || 'cncnet-maps';
-const delayBetweenRequests = process.env.REQUEST_DELAY || 500;
-const debug = process.env.DEBUG;
-const cwd = process.env.RUN_UNPACKAGED ? process.cwd() : path.dirname(process.execPath);
-const destinationDirAbsolutePath = path.resolve(cwd, destinationDir);
+const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
+const { unzipMaps } = require('./unzip-maps');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
@@ -21,65 +11,6 @@ if (!fs.existsSync(destinationDirAbsolutePath)) {
 } else {
   process.stdout.write(`Using existing destination dir: ${destinationDir}`);
 }
-
-/**
- * Builds a file name, escaping strange chars & appending the hash.
- *
- * @param { string } name
- * @param { string } hash
- * @param { string } filePath
- */
-const buildFileName = (name, hash, filePath) =>
-  sanitize(name + ` {{${hash}}}` + filePath.slice(filePath.lastIndexOf('.') || '.map'));
-
-/**
- * Wraps a fs.writeFile call into a promise.
- *
- * @param { string } name
- * @param { Buffer } buffer
- */
-const writeFileAsync = (fileName, buffer) =>
-  new Promise((resolve, reject) => {
-    const filePath = path.resolve(cwd, fileName);
-    if (debug) {
-      console.log(`Writing ${fileName} to ${filePath}`);
-    }
-
-    fs.writeFile(filePath, buffer, function(err) {
-      if (err) {
-        if (debug) {
-          console.error(`Failed to write file ${fileName} to ${filePath}`, err);
-        }
-
-        reject(err);
-      }
-
-      resolve();
-    });
-  });
-
-/**
- * Unzips a file from a url.
- *
- * @param { {name: string, hash: string, date: string } } mapObject Cncnet map object.
- */
-const unzipAsync = ({ name, hash } = {}) => () =>
-  unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
-    .then(
-      async (directory) =>
-        await directory.files.map(async (file) => {
-          const buffer = await file.buffer();
-          const prettyFileName = `${destinationDirAbsolutePath}/${buildFileName(name, hash, file.path)}`;
-          await writeFileAsync(prettyFileName, buffer);
-          return hash;
-        })
-    )
-    .catch((error) => {
-      if (debug) {
-        console.error(error);
-      }
-      throw hash;
-    });
 
 /**
  * Filters an array of maps by maps already present in the 'file list'.
@@ -103,53 +34,38 @@ const filterByExistingMaps = (destinationDirFilelist) => ({ hash }) =>
  * A delay between requests is made to be nice :-)
  */
 const main = async () => {
-  const filesWrote = [];
-  const filesErrored = [];
   const searchUrl = mapAge
     ? `https://mapdb.cncnet.org/search-json.php?game=${gameType}&age=${mapAge}`
     : `https://mapdb.cncnet.org/search-json.php?game=${gameType}`;
 
   if (shouldScrape) {
-    console.warn('Scarping not implemented. Usig cncnet search-json url to list all maps.');
+    console.warn('Scarping not implemented. Using cncnet search-json url to list all maps.');
   }
 
-  await axios.get(searchUrl).then((res) => {
-    const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-    const mapRequests = res.data.filter(filterByExistingMaps(destinationDirFilelist)).map(unzipAsync);
-    const filesSkipped = res.data.length - mapRequests.length - 1;
+  await axios
+    .get(searchUrl)
+    .then((res) => {
+      const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
+      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist));
+      const filesSkipped = res.data.length - maps.length - 1;
 
-    if (filesSkipped > 0) {
-      console.log(`\nSkipped ${destinationDirFilelist.length} existing maps.`);
-    }
+      if (filesSkipped > 0) {
+        console.log(`\nSkipped ${destinationDirFilelist.length} existing maps.`);
+      }
 
-    const handleUnzipPromise = (unzipPromise) => () => {
-      process.stdout.clearLine();
-      process.stdout.cursorTo(0);
-      process.stdout.write(`Downloading ${filesWrote.length + filesErrored.length + 1}/${mapRequests.length}`);
-      unzipPromise()
-        .then((hashes) => filesWrote.push(...hashes))
-        .catch((hash) => filesErrored.push(hash));
-    };
+      return unzipMaps(maps);
+    })
+    .then(({ filesWrote, filesErrored }) => {
+      console.log(`Done.
 
-    // Run promises in sequence with a delay.
-    return mapRequests.reduce(
-      (acc, cur) =>
-        acc.then(() =>
-          new Promise((resolve) => setTimeout(() => resolve(), delayBetweenRequests)).then(handleUnzipPromise(cur))
-        ),
-      Promise.resolve()
-    );
-  });
-
-  console.log(`Done.
-
-  -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
-  -  ${
-    filesErrored.length
-      ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
-      : 'All downloads succesfull.'
-  }
-  `);
+      -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
+      -  ${
+        filesErrored.length
+          ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
+          : 'All downloads succesfull.'
+      }
+      `);
+    });
 };
 
 main();
