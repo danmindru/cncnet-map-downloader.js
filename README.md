@@ -8,7 +8,7 @@ Grab the latest binary release on [the release page](https://github.com/danmindr
 
 Double-click your favorite executable (win, mac, linux).
 
-- By default, it only downloads Yuri (yr) maps, but can be configured to download other types.
+- By default, it only downloads Yuri (yr) maps, but can be configured to download other types. See config below.
 - If the process is somehow killed, it will resume downloading maps that haven't been downloaded yet.
 
 | Windows preview | Mac preview |
@@ -42,7 +42,7 @@ DESTINATION_DIR=my-yuri-maps ./cncnet-map-downloader-js-1-1-1-macos
 GAME_TYPE=ra ./cncnet-map-downloader-js-1-1-1-macos
 ```
 
-- Get all Tiberium Sun maps, not older than 1 year
+- Get all Tiberian Sun maps, not older than 1 year
 ```bash
 GAME_TYPE=ts MAP_AGE=12 ./cncnet-map-downloader-js-1-1-1-macos
 ```
