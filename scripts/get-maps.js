@@ -8,6 +8,7 @@ const sanitize = require('sanitize-filename');
 
 const shouldScrape = process.env.FORCE_SCAPE;
 const gameType = process.env.GAME_TYPE || 'yr';
+const mapAge = process.env.MAP_AGE || null;
 const destinationDir = process.env.DESTINATION_DIR || 'cncnet-maps';
 const delayBetweenRequests = process.env.REQUEST_DELAY || 500;
 const debug = process.env.DEBUG;
@@ -63,7 +64,7 @@ const writeFileAsync = (fileName, buffer) =>
  * @param { {name: string, hash: string, date: string } } mapObject Cncnet map object.
  */
 const unzipAsync = ({ name, hash } = {}) => () =>
-  unzipper.Open.url(request, `http://mapdb.cncnet.org/yr/${hash}.zip`)
+  unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
     .then(
       async (directory) =>
         await directory.files.map(async (file) => {
@@ -104,12 +105,15 @@ const filterByExistingMaps = (destinationDirFilelist) => ({ hash }) =>
 const main = async () => {
   const filesWrote = [];
   const filesErrored = [];
+  const searchUrl = mapAge
+    ? `https://mapdb.cncnet.org/search-json.php?game=${gameType}&age=${mapAge}`
+    : `https://mapdb.cncnet.org/search-json.php?game=${gameType}`;
 
   if (shouldScrape) {
     console.warn('Scarping not implemented. Usig cncnet search-json url to list all maps.');
   }
 
-  await axios.get(`https://mapdb.cncnet.org/search-json.php?game=${gameType}`).then((res) => {
+  await axios.get(searchUrl).then((res) => {
     const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
     const mapRequests = res.data.filter(filterByExistingMaps(destinationDirFilelist)).map(unzipAsync);
     const filesSkipped = res.data.length - mapRequests.length - 1;
