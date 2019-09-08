@@ -2,8 +2,9 @@ const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk');
 
-const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
+const { destinationDir, debug, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
 const { unzipMaps } = require('./unzip-maps');
+const { removeDuplicates } = require('./remove-duplicates');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
@@ -42,6 +43,10 @@ const main = async () => {
     console.warn('Scarping not implemented. Using cncnet search-json url to list all maps.');
   }
 
+  if (debug) {
+    console.log(`\nGettings maps from ${searchUrl}\n`);
+  }
+
   await axios
     .get(searchUrl)
     .then((res) => {
@@ -54,6 +59,9 @@ const main = async () => {
       }
 
       return unzipMaps(maps);
+    })
+    .then(({ filesWrote, filesErrored }) => {
+      return { filesWrote: removeDuplicates(filesWrote), filesErrored };
     })
     .then(({ filesWrote, filesErrored }) => {
       console.log(`Done.
