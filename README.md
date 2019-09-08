@@ -21,17 +21,13 @@ Clone the repo, then run `npm install`. <br/>
 You can start a download with `npm run download`. Downloads can be configured in `package.json` under scripts.
 
 ### Configuration
+You can configure the downloader through enviornment variables.
+
 - `MAP_AGE` - the age of the map in months (default: not specified - will get all). Example: `12` will get maps that are 1 year old and newer.
 - `GAME_TYPE` - the type of maps to download (default: `yr`). Available: `ts`, `ra`, `d2`, `td`, `dta`.
 - `DESTINATION_DIR` - the location to download files (default: `cncnet-maps`).
 
-##### Dev config
-- `RUN_UNPACKAGED` - run the script in unpacked mode[1] (default: `false`; see `npm run download` in `package.json` for an example).
-- `DEBUG` - print additional debug info.
-
-> [1] essentially, run the non-binary script. Requires node v10+ & `npm install`
-
-### Examples
+#### Configuration examples
 - Get all Yuri's Revenge / Red Alert 2 maps in a custom directory
 ```bash
 DESTINATION_DIR=my-yuri-maps ./cncnet-map-downloader-js-1-1-1-macos
@@ -46,6 +42,11 @@ GAME_TYPE=ra ./cncnet-map-downloader-js-1-1-1-macos
 ```bash
 GAME_TYPE=ts MAP_AGE=12 ./cncnet-map-downloader-js-1-1-1-macos
 ```
+##### Dev config
+- `RUN_UNPACKAGED` - run the script in unpacked mode[1] (default: `false`; see `npm run download` in `package.json` for an example).
+- `DEBUG` - print additional debug info.
+
+> [1] essentially, run the non-binary script. Requires node v10+ & `npm install`
 
 ### About the method
 Uses the cncnet search endpoint to retrieve all existing maps, then requests each map zip individually with a delay to be nice on the server.
