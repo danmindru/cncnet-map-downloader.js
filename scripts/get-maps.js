@@ -47,33 +47,36 @@ const main = async () => {
     console.log(`\nGettings maps from ${searchUrl}\n`);
   }
 
-  await axios
+  const { filesWrote, filesErrored } = await axios
     .get(searchUrl)
     .then((res) => {
       const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist));
+      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist)).slice(0, 5);
       const filesSkipped = res.data.length - maps.length - 1;
 
-      if (filesSkipped > 0) {
+      if (filesSkipped >= 0) {
         console.log(`\nSkipped ${destinationDirFilelist.length} existing maps.`);
       }
 
       return unzipMaps(maps);
     })
-    .then(({ filesWrote, filesErrored }) => {
-      return { filesWrote: removeDuplicates(filesWrote), filesErrored };
-    })
-    .then(({ filesWrote, filesErrored }) => {
-      console.log(`Done.
 
-      -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
-      -  ${
-        filesErrored.length
-          ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
-          : 'All downloads succesfull.'
-      }
-      `);
-    });
+    const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
+
+    console.log(`Done.
+
+    -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
+    -  ${
+          filesErrored.length
+            ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
+            : 'All downloads successful.'
+        }
+    -  ${
+          filesDedupedNumber
+            ? chalk.yellow(`Removed ${filesDedupedNumber} files that appeared to be duplicates.`)
+            : 'No duplicates found.'
+        }
+    `);
 };
 
 main();
