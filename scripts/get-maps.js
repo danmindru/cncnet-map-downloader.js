@@ -51,7 +51,7 @@ const main = async () => {
     .get(searchUrl)
     .then((res) => {
       const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist)).slice(0, 5);
+      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist));
       const filesSkipped = res.data.length - maps.length - 1;
 
       if (filesSkipped >= 0) {
