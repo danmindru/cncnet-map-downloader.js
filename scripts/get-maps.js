@@ -24,7 +24,7 @@ const main = async () => {
     : `https://mapdb.cncnet.org/search-json.php?game=${gameType}`;
 
   if (shouldScrape) {
-    console.warn(chalk.yellow('Scarping not implemented. Using cncnet search-json url to list all maps.'));
+    console.warn(chalk.yellow('Scraping not implemented. Using cncnet search-json url to list all maps.'));
   }
 
   console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...\n`);
