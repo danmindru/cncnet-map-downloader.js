@@ -3,6 +3,7 @@ const path = require('path');
 const hasha = require('hasha');
 const chalk = require('chalk');
 
+const { runPromisesWithProgress } = require('./util');
 const { flatten } = require('lodash');
 const { debug } = require('./constants');
 
@@ -53,14 +54,14 @@ const removeDuplicates = async (targetDir) => {
   console.log(`\nComparing file sizes...`);
 
   // Get file sizes, filtering out failed fs.stats
-  const fileSizes = await Promise.all(targetDirFilelist.map(getFileSize(targetDir)));
+  const fileSizes = await runPromisesWithProgress(targetDirFilelist.map(getFileSize(targetDir)), 'Getting size of files');
   const filesBySize = fileSizes
     .filter((size) => size)
     .reduce((acc, { size, filePath }) => {
       return { ...acc, [size]: acc[size] ? [...acc[size], filePath] : [filePath] };
     }, {});
 
-  console.log(`Checking for duplicates...`);
+  console.log(`\nChecking for duplicates...`);
 
   // Filter by items with duplicates
   const fileIndexesWithSameSize = Object.keys(filesBySize).filter((key) => {
@@ -94,7 +95,7 @@ const removeDuplicates = async (targetDir) => {
     })
   );
 
-  const removalResult = await Promise.all(fileRemovalPromises);
+  const removalResult = await runPromisesWithProgress(fileRemovalPromises, 'Removing duplicate files');
   return removalResult.filter((resolved) => resolved).length;
 };
 
