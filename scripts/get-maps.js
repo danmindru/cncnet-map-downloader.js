@@ -2,8 +2,8 @@ const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk');
 
-const { differenceWith, isEqual } = require('lodash');
-const { destinationDir, debug, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
+const { differenceWith } = require('lodash');
+const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
 const { unzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 
@@ -38,12 +38,16 @@ const main = async () => {
       const newMaps = differenceWith(
         res.data,
         destinationDirFilelist,
-        (mapObject, fileName) => fileName.match(new RegExp(`{{(${mapObject.hash})}}`, 'gi'))
+        (mapObject, fileName) => fileName.indexOf(mapObject.hash) !== -1
       );
       const filesSkipped = res.data.length - newMaps.length;
 
       if (filesSkipped >= 0) {
-        console.log(chalk.yellow(`\nSkipped ${filesSkipped} map names that already exist in the target directory.`));
+        if(filesSkipped === res.data.length) {
+          console.log(chalk.gray(`\nNo new files to download (skipped ${filesSkipped} map names that already exist in the target directory)`));
+        } else {
+          console.log(chalk.yellow(`\nSkipped ${filesSkipped} map names that already exist in the target directory.`));
+        }
       }
 
       return unzipMaps(newMaps);

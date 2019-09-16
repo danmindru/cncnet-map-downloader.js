@@ -6,6 +6,7 @@ const request = require('request');
 const chalk = require('chalk');
 
 const { debug, cwd, destinationDirAbsolutePath, gameType, delayBetweenRequests } = require('./constants');
+const { replaceLine } = require('./util');
 
 /**
  * Delays by the specified time.
@@ -85,9 +86,7 @@ const unzipMaps = async (mapObjects) => {
 
     try {
       // Try to unzip a file, writing the status in the terminal. Either pushes the has to the filesWrote or filesErrored object.
-      process.stdout.clearLine();
-      process.stdout.cursorTo(0);
-      process.stdout.write(`Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length}`);
+      replaceLine(`Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length}`);
 
       const hashes = await unzipAsync(mapObject);
       filesWrote.push(...hashes);
