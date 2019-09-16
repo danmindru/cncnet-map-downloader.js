@@ -40,7 +40,7 @@ const writeFileAsync = (fileName, buffer, hash) =>
 
     fs.writeFile(filePath, buffer, function (err) {
       if (err) {
-        console.error(`Failed to write file ${fileName} to ${filePath}`, err);
+        console.error(chalk.red(`\nFailed to write file ${fileName} to ${filePath}`), err);
         reject(hash);
       }
 
@@ -64,7 +64,7 @@ const unzipAsync = ({ name, hash } = {}) => unzipper.Open.url(request, `http://m
     }))
   )
   .catch((error) => {
-    console.error(chalk.bold(`Failed to download & unzip file ${name} (hash: ${hash})`, error));
+    console.error(chalk.red(`\nFailed to download & unzip file ${name} (hash: ${hash})`, error));
     throw hash;
   });
 
@@ -87,7 +87,7 @@ const unzipMaps = async (mapObjects) => {
       // Try to unzip a file, writing the status in the terminal. Either pushes the has to the filesWrote or filesErrored object.
       process.stdout.clearLine();
       process.stdout.cursorTo(0);
-      process.stdout.write(`Downloading ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length}`);
+      process.stdout.write(`Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length}`);
 
       const hashes = await unzipAsync(mapObject);
       filesWrote.push(...hashes);
