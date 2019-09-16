@@ -2,15 +2,16 @@ const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk');
 
+const { differenceWith, isEqual } = require('lodash');
 const { destinationDir, debug, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
 const { unzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
-  process.stdout.write(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`);
+  process.stdout.write(chalk.gray(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`));
 } else {
-  process.stdout.write(`Using existing destination dir: ${destinationDir}`);
+  process.stdout.write(chalk.gray(`Using existing destination dir: ${destinationDir}`));
 }
 
 /**
@@ -40,30 +41,31 @@ const main = async () => {
     : `https://mapdb.cncnet.org/search-json.php?game=${gameType}`;
 
   if (shouldScrape) {
-    console.warn('Scarping not implemented. Using cncnet search-json url to list all maps.');
+    console.warn(chalk.yellow('Scarping not implemented. Using cncnet search-json url to list all maps.'));
   }
 
-  if (debug) {
-    console.log(`\nGettings maps from ${searchUrl}\n`);
-  }
+  console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...\n`);
 
   const { filesWrote, filesErrored } = await axios
     .get(searchUrl)
     .then((res) => {
+      console.log(chalk.green(`Got ${res.data.length} maps. Searching destination folder for existing maps (by name)...`));
+
       const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist));
-      const filesSkipped = res.data.length - maps.length - 1;
+      const newMaps = differenceWith(res.data, destinationDirFilelist, (mapObject, fileName) => mapObject.name === fileName);
+      const filesSkipped = res.data.length - newMaps.length;
+
 
       if (filesSkipped >= 0) {
-        console.log(`\nSkipped ${destinationDirFilelist.length} existing maps.`);
+        console.log(chalk.yellow(`\nSkipped ${destinationDirFilelist.length} map names that already exist in the target directory.`));
       }
 
-      return unzipMaps(maps);
-    })
+      return unzipMaps(newMaps);
+    });
 
     const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
 
-    console.log(`Done.
+    console.log(`\nDone.
 
     -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
     -  ${
