@@ -15,23 +15,6 @@ if (!fs.existsSync(destinationDirAbsolutePath)) {
 }
 
 /**
- * Filters an array of maps by maps already present in the 'file list'.
- *
- * @param { Array<string> } destinationDirFilelist
- */
-const filterByExistingMaps = (destinationDirFilelist) => ({ hash }) =>
-  !destinationDirFilelist.some((fileName) => {
-    const matches = fileName.match(new RegExp(`{{(${hash})}}`, 'gi'));
-
-    if (matches) {
-      // If file matches and, presumably, has all the content written, skip it.
-      const stats = fs.statSync(`${destinationDirAbsolutePath}/${fileName}`);
-      const fileSizeInBytes = stats.size;
-      return fileSizeInBytes > 0;
-    }
-  });
-
-/**
  * Lists all maps then downloads them & unzips into the dir of choice.
  * A delay between requests is made to be nice :-)
  */
@@ -52,12 +35,15 @@ const main = async () => {
       console.log(chalk.green(`Got ${res.data.length} maps. Searching destination folder for existing maps (by name)...`));
 
       const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-      const newMaps = differenceWith(res.data, destinationDirFilelist, (mapObject, fileName) => mapObject.name === fileName);
+      const newMaps = differenceWith(
+        res.data,
+        destinationDirFilelist,
+        (mapObject, fileName) => fileName.match(new RegExp(`{{(${mapObject.hash})}}`, 'gi'))
+      );
       const filesSkipped = res.data.length - newMaps.length;
 
-
       if (filesSkipped >= 0) {
-        console.log(chalk.yellow(`\nSkipped ${destinationDirFilelist.length} map names that already exist in the target directory.`));
+        console.log(chalk.yellow(`\nSkipped ${filesSkipped} map names that already exist in the target directory.`));
       }
 
       return unzipMaps(newMaps);
