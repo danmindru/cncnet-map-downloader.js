@@ -2,33 +2,17 @@ const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk');
 
-const { destinationDir, debug, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
+const { differenceWith } = require('lodash');
+const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
 const { unzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
-  process.stdout.write(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`);
+  process.stdout.write(chalk.gray(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`));
 } else {
-  process.stdout.write(`Using existing destination dir: ${destinationDir}`);
+  process.stdout.write(chalk.gray(`Using existing destination dir: ${destinationDir}`));
 }
-
-/**
- * Filters an array of maps by maps already present in the 'file list'.
- *
- * @param { Array<string> } destinationDirFilelist
- */
-const filterByExistingMaps = (destinationDirFilelist) => ({ hash }) =>
-  !destinationDirFilelist.some((fileName) => {
-    const matches = fileName.match(new RegExp(`{{(${hash})}}`, 'gi'));
-
-    if (matches) {
-      // If file matches and, presumably, has all the content written, skip it.
-      const stats = fs.statSync(`${destinationDirAbsolutePath}/${fileName}`);
-      const fileSizeInBytes = stats.size;
-      return fileSizeInBytes > 0;
-    }
-  });
 
 /**
  * Lists all maps then downloads them & unzips into the dir of choice.
@@ -40,30 +24,38 @@ const main = async () => {
     : `https://mapdb.cncnet.org/search-json.php?game=${gameType}`;
 
   if (shouldScrape) {
-    console.warn('Scarping not implemented. Using cncnet search-json url to list all maps.');
+    console.warn(chalk.yellow('Scraping not implemented. Using cncnet search-json url to list all maps.'));
   }
 
-  if (debug) {
-    console.log(`\nGettings maps from ${searchUrl}\n`);
-  }
+  console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...\n`);
 
   const { filesWrote, filesErrored } = await axios
     .get(searchUrl)
     .then((res) => {
+      console.log(chalk.green(`Got ${res.data.length} maps. Searching destination folder for existing maps (by name)...`));
+
       const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-      const maps = res.data.filter(filterByExistingMaps(destinationDirFilelist));
-      const filesSkipped = res.data.length - maps.length - 1;
+      const newMaps = differenceWith(
+        res.data,
+        destinationDirFilelist,
+        (mapObject, fileName) => fileName.indexOf(mapObject.hash) !== -1
+      );
+      const filesSkipped = res.data.length - newMaps.length;
 
       if (filesSkipped >= 0) {
-        console.log(`\nSkipped ${destinationDirFilelist.length} existing maps.`);
+        if(filesSkipped === res.data.length) {
+          console.log(chalk.gray(`\nNo new files to download (skipped ${filesSkipped} map names that already exist in the target directory)`));
+        } else {
+          console.log(chalk.yellow(`\nSkipped ${filesSkipped} map names that already exist in the target directory.`));
+        }
       }
 
-      return unzipMaps(maps);
-    })
+      return unzipMaps(newMaps);
+    });
 
     const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
 
-    console.log(`Done.
+    console.log(`\nDone.
 
     -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
     -  ${

@@ -2,7 +2,7 @@ const path = require('path');
 
 const shouldScrape = process.env.FORCE_SCAPE;
 const gameType = process.env.GAME_TYPE || 'yr';
-const mapAge = process.env.MAP_AGE || null;
+const mapAge = process.env.MAP_AGE || 0;
 const destinationDir = process.env.DESTINATION_DIR || 'cncnet-maps';
 const delayBetweenRequests = process.env.REQUEST_DELAY || 500;
 const debug = process.env.DEBUG;
