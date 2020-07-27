@@ -4,13 +4,22 @@ const chalk = require('chalk');
 const ora = require('ora');
 
 const { differenceWith } = require('lodash');
-const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType, maxNumberOfMaps } = require('./constants');
+const {
+  destinationDir,
+  destinationDirAbsolutePath,
+  mapAge,
+  shouldScrape,
+  gameType,
+  maxNumberOfMaps,
+} = require('./constants');
 const { downloadAndUnzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
-  process.stdout.write(chalk.gray(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`));
+  process.stdout.write(
+    chalk.gray(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`)
+  );
 } else {
   process.stdout.write(chalk.gray(`Using existing destination dir: ${destinationDir}`));
 }
@@ -31,52 +40,63 @@ const main = async () => {
   console.clear(); // Clear previous output.
   console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...`);
 
-  const spinner = ora({ text: 'Getting maps', spinner:'material'});
-  const { filesWrote, filesErrored, numberOfFilesSkipped } = await axios
-    .get(searchUrl)
-    .then((res) => {
-      const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
-      const mapsWithLimitApplied = maxNumberOfMaps && maxNumberOfMaps !== -1 ? res.data.slice(0, maxNumberOfMaps) : res.data
-      const newMaps = differenceWith(
-        mapsWithLimitApplied,
-        destinationDirFilelist,
-        (mapObject, fileName) => fileName.indexOf(mapObject.hash) !== -1
-      );
-      const numberOfFilesSkipped = mapsWithLimitApplied.length - newMaps.length;
+  const spinner = ora({ text: 'Getting maps', spinner: 'material' });
+  const { filesWrote, filesErrored, numberOfFilesSkipped } = await axios.get(searchUrl).then((res) => {
+    const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
+    const mapsWithLimitApplied =
+      maxNumberOfMaps && maxNumberOfMaps !== -1 ? res.data.slice(0, maxNumberOfMaps) : res.data;
+    const newMaps = differenceWith(
+      mapsWithLimitApplied,
+      destinationDirFilelist,
+      (mapObject, fileName) => fileName.indexOf(mapObject.hash) !== -1
+    );
+    const numberOfFilesSkipped = mapsWithLimitApplied.length - newMaps.length;
 
-      console.log(chalk.green(`\nGot ${mapsWithLimitApplied.length} maps. Searching destination folder for existing maps (by name)...`));
+    console.log(
+      chalk.green(
+        `\nGot ${mapsWithLimitApplied.length} maps. Searching destination folder for existing maps (by name)...`
+      )
+    );
 
-      if (numberOfFilesSkipped >= 0) {
-        if(numberOfFilesSkipped === mapsWithLimitApplied.length) {
-          console.log(chalk.gray(`\nNo new files to download (skipped ${numberOfFilesSkipped} map names that already exist in the target directory).\n`));
-        } else {
-          console.log(chalk.yellow(`\nSkipped ${numberOfFilesSkipped} map names that already exist in the target directory.\n`));
-        }
+    if (numberOfFilesSkipped >= 0) {
+      if (numberOfFilesSkipped === mapsWithLimitApplied.length) {
+        console.log(
+          chalk.gray(
+            `\nNo new files to download (skipped ${numberOfFilesSkipped} map names that already exist in the target directory).\n`
+          )
+        );
+      } else {
+        console.log(
+          chalk.yellow(`\nSkipped ${numberOfFilesSkipped} map names that already exist in the target directory.\n`)
+        );
       }
+    }
 
-      spinner.start();
-      return downloadAndUnzipMaps(newMaps, numberOfFilesSkipped, spinner)
-    })
-    spinner.stop();
+    spinner.start();
+    return downloadAndUnzipMaps(newMaps, numberOfFilesSkipped, spinner);
+  });
+  spinner.stop();
 
-    const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
+  const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
 
-    console.clear(); // Clear previous output.
-    console.log(`\nDone. Here's the executive summary:
+  console.clear(); // Clear previous output.
+  console.log(`\nDone. Here's the executive summary:
     -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
     -  ${
       filesErrored.length
-      ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
-      : chalk.green('All downloads successful.')
+        ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
+        : chalk.green('All downloads successful.')
     }
-    -  ${ numberOfFilesSkipped
-      ? chalk.yellow(`Skipped ${numberOfFilesSkipped} files that were previously downloaded.`)
-      : 'No files skipped.'}
     -  ${
-          filesDedupedNumber
-            ? chalk.yellow(`Removed ${filesDedupedNumber} files that appeared to be duplicates.`)
-            : 'No duplicates found.'
-        }
+      numberOfFilesSkipped
+        ? chalk.yellow(`Skipped ${numberOfFilesSkipped} files that were previously downloaded.`)
+        : 'No files skipped.'
+    }
+    -  ${
+      filesDedupedNumber
+        ? chalk.yellow(`Removed ${filesDedupedNumber} files that appeared to be duplicates.`)
+        : 'No duplicates found.'
+    }
     `);
 };
 

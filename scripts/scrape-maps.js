@@ -11,5 +11,5 @@ const maxQuery = parseInt('zzz', 36);
 module.exports = {
   queryMap: Array(maxQuery - minQuery + 1)
     .fill(null)
-    .map((_u, index) => (index + minQuery).toString(36))
+    .map((_u, index) => (index + minQuery).toString(36)),
 };

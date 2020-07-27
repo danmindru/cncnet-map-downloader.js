@@ -13,8 +13,7 @@ const { replaceLine, replaceOraLine } = require('./util');
  *
  * @param { number } time
  */
-const delay = (time) =>
-  new Promise((resolve) => setTimeout(resolve, time));
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 /**
  * Builds a file name, escaping strange chars & appending the hash.
@@ -57,18 +56,21 @@ const writeFileAsync = (fileName, buffer, hash) =>
  *
  * @return { string } hash of unzipped file (or file that errored during unzip).
  */
-const unzipAsync = ({ name, hash } = {}) => unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
-  .then(
-    async (directory) => Promise.all(directory.files.map(async (file) => {
-      const buffer = await file.buffer();
-      const prettyFileName = `${destinationDirAbsolutePath}/${buildFileName(name, hash, file.path)}`;
-      return writeFileAsync(prettyFileName, buffer, hash);
-    }))
-  )
-  .catch((error) => {
-    console.error(chalk.red(`\nFailed to download & unzip file ${name} (hash: ${hash})`, error));
-    throw hash;
-  });
+const unzipAsync = ({ name, hash } = {}) =>
+  unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
+    .then(async (directory) =>
+      Promise.all(
+        directory.files.map(async (file) => {
+          const buffer = await file.buffer();
+          const prettyFileName = `${destinationDirAbsolutePath}/${buildFileName(name, hash, file.path)}`;
+          return writeFileAsync(prettyFileName, buffer, hash);
+        })
+      )
+    )
+    .catch((error) => {
+      console.error(chalk.red(`\nFailed to download & unzip file ${name} (hash: ${hash})`, error));
+      throw hash;
+    });
 
 /**
  * Downloads & Unzips a list of map objects.
@@ -79,30 +81,33 @@ const unzipAsync = ({ name, hash } = {}) => unzipper.Open.url(request, `http://m
  *
  * @return { { filesErrored: Array<string>, filesWrote: Array<string> } }
  */
+
 const downloadAndUnzipMaps = async (mapObjects, numberOfFilesSkipped, spinner) => {
   const filesErrored = [];
   const filesWrote = [];
 
   // Run promises in sequence with a delay, to not upset our cncnet friends.
   for (const mapObject of mapObjects) {
-    await delay(delayBetweenRequests)
+    await delay(delayBetweenRequests);
 
     try {
       // Try to unzip a file, writing the status in the terminal. Either pushes the has to the filesWrote or filesErrored object.
-      const message = `Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length} (${numberOfFilesSkipped} skipped)`
+      const message = `Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${
+        mapObjects.length
+      } (${numberOfFilesSkipped} skipped)`;
 
-      if(spinner) {
-        replaceOraLine(message, spinner)
+      if (spinner) {
+        replaceOraLine(message, spinner);
       } else {
-
         replaceLine(message);
       }
 
       const hashes = await unzipAsync(mapObject);
       filesWrote.push(...hashes);
-    }
-    catch (error) {
-      if(debug) { console.error(error) }
+    } catch (error) {
+      if (debug) {
+        console.error(error);
+      }
       filesErrored.push(error);
     }
   }
@@ -110,10 +115,10 @@ const downloadAndUnzipMaps = async (mapObjects, numberOfFilesSkipped, spinner) =
   return {
     filesErrored,
     filesWrote,
-    numberOfFilesSkipped
+    numberOfFilesSkipped,
   };
 };
 
 module.exports = {
-  downloadAndUnzipMaps
+  downloadAndUnzipMaps,
 };
