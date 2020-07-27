@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "download": "MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
+    "dev": "MAX_NUMBER_OF_MAPS=5 REQUEST_DELAY=5000 MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
     "lint": "eslint ./**/*.js ",
     "publish:all": "node package.js"
   },
@@ -36,12 +37,22 @@
     "chalk": "^2.4.2",
     "hasha": "^5.0.0",
     "lodash": "^4.17.15",
+    "ora": "^4.0.5",
     "pkg": "^4.3.7",
     "request": "^2.88.0",
     "sanitize-filename": "^1.6.2",
     "unzipper": "^0.10.1"
   },
   "devDependencies": {
-    "eslint": "^6.4.0"
+    "eslint": "^6.4.0",
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run test",
+      "pre-commit": "npm run lint && node ./node_modules/.bin/pretty-quick --staged --pattern ./**/*.js"
+    }
   }
 }

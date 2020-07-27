@@ -6,14 +6,15 @@ const request = require('request');
 const chalk = require('chalk');
 
 const { debug, cwd, destinationDirAbsolutePath, gameType, delayBetweenRequests } = require('./constants');
-const { replaceLine } = require('./util');
+const { replaceLine, replaceOraLine } = require('./util');
 
 /**
  * Delays by the specified time.
  *
  * @param { number } time
  */
-const delay = (time) => new Promise((resolve) => setTimeout(resolve), time);
+const delay = (time) =>
+  new Promise((resolve) => setTimeout(resolve, time));
 
 /**
  * Builds a file name, escaping strange chars & appending the hash.
@@ -36,7 +37,7 @@ const writeFileAsync = (fileName, buffer, hash) =>
   new Promise((resolve, reject) => {
     const filePath = path.resolve(cwd, fileName);
     if (debug) {
-      console.log(`Writing ${fileName} to ${filePath}`);
+      console.log(`\nWriting ${fileName} to ${filePath}`);
     }
 
     fs.writeFile(filePath, buffer, function (err) {
@@ -73,10 +74,12 @@ const unzipAsync = ({ name, hash } = {}) => unzipper.Open.url(request, `http://m
  * Downloads & Unzips a list of map objects.
  *
  * @param { Array<{name: string, hash: string, date: string }> } mapObjects
+ * @param { number } numberOfFilesSkipped
+ * @param { Object } [spinner] Ora spinner instance used to display progress.
  *
  * @return { { filesErrored: Array<string>, filesWrote: Array<string> } }
  */
-const downloadAndUnzipMaps = async (mapObjects) => {
+const downloadAndUnzipMaps = async (mapObjects, numberOfFilesSkipped, spinner) => {
   const filesErrored = [];
   const filesWrote = [];
 
@@ -86,19 +89,28 @@ const downloadAndUnzipMaps = async (mapObjects) => {
 
     try {
       // Try to unzip a file, writing the status in the terminal. Either pushes the has to the filesWrote or filesErrored object.
-      replaceLine(`Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length}`);
+      const message = `Downloading & unzipping ${filesWrote.length + filesErrored.length + 1}/${mapObjects.length} (${numberOfFilesSkipped} skipped)`
+
+      if(spinner) {
+        replaceOraLine(message, spinner)
+      } else {
+
+        replaceLine(message);
+      }
 
       const hashes = await unzipAsync(mapObject);
       filesWrote.push(...hashes);
     }
     catch (error) {
+      if(debug) { console.error(error) }
       filesErrored.push(error);
     }
   }
 
   return {
     filesErrored,
-    filesWrote
+    filesWrote,
+    numberOfFilesSkipped
   };
 };
 

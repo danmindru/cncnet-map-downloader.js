@@ -60,7 +60,7 @@ const removeDuplicates = async (targetDir) => {
   const filesBySize = fileSizes
     .filter((size) => size)
     .reduce((acc, { size, filePath }, index) => {
-      replaceLine(`Grouping by size ${index + 1}`);
+      replaceLine(`Grouping by size ${index + 1}/${fileSizes.length}...`);
       acc[size] = acc[size] ? [...acc[size], filePath] : [filePath];
       return acc
     }, {});

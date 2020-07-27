@@ -29,7 +29,18 @@ const replaceLine = (message) => {
   process.stdout.write(message);
 }
 
+/**
+ * Replaces an ora spinner line with the provided message.
+ *
+ * @param { string } message
+ * @param { Object } spinner
+ */
+const replaceOraLine = (message, spinner) => {
+  spinner.text = message
+}
+
 module.exports = {
   runPromisesWithProgress,
-  replaceLine
+  replaceLine,
+  replaceOraLine
 }
