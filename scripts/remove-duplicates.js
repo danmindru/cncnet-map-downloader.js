@@ -49,7 +49,9 @@ const getFileSize = (targetDir) => (filePath) =>
  * @param {string} targetDir Target directory to find duplicates in.
  */
 const removeDuplicates = async (targetDir) => {
-  const targetDirFilelist = fs.readdirSync(targetDir);
+  const targetDirFilelist = fs
+    .readdirSync(targetDir)
+    .filter((filePath) => fs.statSync(path.resolve(targetDir, filePath)).isFile());
 
   console.log(`\nComparing file sizes...`);
 

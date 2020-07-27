@@ -9,11 +9,13 @@ const {
   destinationDirAbsolutePath,
   mapAge,
   shouldScrape,
+  shouldSortInDirectories,
   gameType,
   maxNumberOfMaps,
 } = require('./constants');
 const { downloadAndUnzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
+const { sortMaps } = require('./sort-maps');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
@@ -75,9 +77,16 @@ const main = async () => {
     spinner.start();
     return downloadAndUnzipMaps(newMaps, numberOfFilesSkipped, spinner);
   });
-  spinner.stop();
 
+  spinner.text = 'Removing duplicates';
   const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
+
+  if (shouldSortInDirectories) {
+    spinner.text = 'Sorting maps';
+    await sortMaps(destinationDirAbsolutePath);
+  }
+
+  spinner.stop();
 
   console.clear(); // Clear previous output.
   console.log(`\nDone. Here's the executive summary:

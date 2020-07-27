@@ -1,6 +1,7 @@
 const path = require('path');
 
 const shouldScrape = process.env.FORCE_SCAPE;
+const shouldSortInDirectories = process.env.SKIP_SORTING !== 'false';
 const gameType = process.env.GAME_TYPE || 'yr';
 const mapAge = Number(process.env.MAP_AGE) || 0;
 const destinationDir = process.env.DESTINATION_DIR || 'cncnet-maps';
@@ -12,6 +13,7 @@ const destinationDirAbsolutePath = path.resolve(cwd, destinationDir);
 
 module.exports = {
   shouldScrape,
+  shouldSortInDirectories,
   gameType,
   mapAge,
   destinationDir,
