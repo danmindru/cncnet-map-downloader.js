@@ -1,3 +1,6 @@
+const { resolve } = require('path');
+const { readdir } = require('fs').promises;
+
 /**
  * Run promise chains with progress.
  *
@@ -37,8 +40,25 @@ const replaceOraLine = (message, spinner) => {
   spinner.text = message;
 };
 
+/**
+ * Gets a 'deep' filelist of the given dir.
+ *
+ * @param { string } targetDir
+ */
+const getRecursiveFileList = async (targetDir) => {
+  const items = await readdir(targetDir, { withFileTypes: true });
+  const files = await Promise.all(
+    items.map((item) => {
+      const res = resolve(targetDir, item.name);
+      return item.isDirectory() ? getRecursiveFileList(res) : res;
+    })
+  );
+  return Array.prototype.concat(...files);
+};
+
 module.exports = {
   runPromisesWithProgress,
   replaceLine,
   replaceOraLine,
+  getRecursiveFileList,
 };

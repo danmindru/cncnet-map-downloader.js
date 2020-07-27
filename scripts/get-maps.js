@@ -16,6 +16,7 @@ const {
 const { downloadAndUnzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 const { sortMaps } = require('./sort-maps');
+const { getRecursiveFileList } = require('./util');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
   fs.mkdirSync(destinationDirAbsolutePath);
@@ -43,8 +44,8 @@ const main = async () => {
   console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...`);
 
   const spinner = ora({ text: 'Getting maps', spinner: 'material' });
-  const { filesWrote, filesErrored, numberOfFilesSkipped } = await axios.get(searchUrl).then((res) => {
-    const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
+  const { filesWrote, filesErrored, numberOfFilesSkipped } = await axios.get(searchUrl).then(async (res) => {
+    const destinationDirFilelist = await getRecursiveFileList(destinationDirAbsolutePath);
     const mapsWithLimitApplied =
       maxNumberOfMaps && maxNumberOfMaps !== -1 ? res.data.slice(0, maxNumberOfMaps) : res.data;
     const newMaps = differenceWith(
