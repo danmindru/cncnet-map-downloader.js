@@ -70,13 +70,13 @@ const unzipAsync = ({ name, hash } = {}) => unzipper.Open.url(request, `http://m
   });
 
 /**
- * Unzips a list of map objects.
+ * Downloads & Unzips a list of map objects.
  *
  * @param { Array<{name: string, hash: string, date: string }> } mapObjects
  *
  * @return { { filesErrored: Array<string>, filesWrote: Array<string> } }
  */
-const unzipMaps = async (mapObjects) => {
+const downloadAndUnzipMaps = async (mapObjects) => {
   const filesErrored = [];
   const filesWrote = [];
 
@@ -103,5 +103,5 @@ const unzipMaps = async (mapObjects) => {
 };
 
 module.exports = {
-  unzipMaps
+  downloadAndUnzipMaps
 };

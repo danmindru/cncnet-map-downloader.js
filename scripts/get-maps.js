@@ -1,10 +1,11 @@
 const axios = require('axios');
 const fs = require('fs');
 const chalk = require('chalk');
+const ora = require('ora');
 
 const { differenceWith } = require('lodash');
-const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType } = require('./constants');
-const { unzipMaps } = require('./unzip-maps');
+const { destinationDir, destinationDirAbsolutePath, mapAge, shouldScrape, gameType, maxNumberOfMaps } = require('./constants');
+const { downloadAndUnzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 
 if (!fs.existsSync(destinationDirAbsolutePath)) {
@@ -29,6 +30,7 @@ const main = async () => {
 
   console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...\n`);
 
+  const spinner = ora({ text: 'Getting maps', spinner:'material'}).start();
   const { filesWrote, filesErrored } = await axios
     .get(searchUrl)
     .then((res) => {
@@ -36,7 +38,7 @@ const main = async () => {
 
       const destinationDirFilelist = fs.readdirSync(destinationDirAbsolutePath);
       const newMaps = differenceWith(
-        res.data,
+        maxNumberOfMaps && maxNumberOfMaps !== -1 ? res.data.slice(0, maxNumberOfMaps) : res.data,
         destinationDirFilelist,
         (mapObject, fileName) => fileName.indexOf(mapObject.hash) !== -1
       );
@@ -50,8 +52,9 @@ const main = async () => {
         }
       }
 
-      return unzipMaps(newMaps);
-    });
+      return downloadAndUnzipMaps(newMaps, spinner);
+    })
+    spinner.stop();
 
     const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
 
