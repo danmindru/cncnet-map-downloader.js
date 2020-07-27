@@ -11,7 +11,9 @@ Grab the latest binary release on [the release page](https://github.com/danmindr
 Double-click your favorite executable (win, mac, linux).
 
 - By default, it only downloads Yuri (yr) maps, but can be configured to download other types. See config below.
-- If the process is somehow killed, it will resume downloading maps that haven't been downloaded yet.
+- If the process is somehow killed, it will resume downloading maps that haven't been downloaded yet (skips previously downlaoded maps).
+- It sorts maps in directories by name (alpha numeric).
+- It checks for duplicate maps (size, id, sha).
 
 | Windows preview                                                                                                                 | Mac preview                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
