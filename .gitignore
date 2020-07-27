@@ -27,6 +27,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # downloads
-cncnet-yuri-maps
+cncnet-yuri-maps*
 experiment
 packages
