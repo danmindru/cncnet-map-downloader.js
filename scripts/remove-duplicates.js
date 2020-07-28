@@ -3,7 +3,7 @@ const path = require('path');
 const hasha = require('hasha');
 const chalk = require('chalk');
 
-const { runPromisesWithProgress, replaceLine } = require('./util');
+const { runPromisesWithProgress, replaceLine, getRecursiveFileList } = require('./util');
 const { flatten } = require('lodash');
 const { debug } = require('./constants');
 
@@ -24,7 +24,7 @@ const removeFile = (targetDir) => (filePath) =>
     })
   ).catch((error) => {
     if (debug) {
-      console.error('Failed to remove file', error);
+      console.error(`Failed to remove ${filePath}`, error);
     }
   });
 
@@ -57,9 +57,9 @@ const getFileSize = (targetDir) => (filePath) =>
  * @param {string} targetDir Target directory to find duplicates in.
  */
 const removeDuplicates = async (targetDir) => {
-  const targetDirFilelist = fs
-    .readdirSync(targetDir)
-    .filter((filePath) => fs.statSync(path.resolve(targetDir, filePath)).isFile());
+  const targetDirFilelist = (await getRecursiveFileList(targetDir)).filter((filePath) =>
+    fs.statSync(path.resolve(targetDir, filePath)).isFile()
+  );
 
   console.log(`\nComparing file sizes...`);
 
@@ -105,7 +105,7 @@ const removeDuplicates = async (targetDir) => {
 
       if (debug) {
         console.debug(chalk.green(`\nFound map duplicates for file: ${filesBySize[key][0]}. Will keep only 1 map.`));
-        console.debug(chalk.yellow(`Removing duplicates: ${filesToRemove.map((f) => `\n - ${chalk.bold(f)}`)}`));
+        console.debug(chalk.yellow(`Will remove duplicates: ${filesToRemove.map((f) => `\n - ${chalk.bold(f)}`)}`));
       }
 
       return filesToRemove.map(removeFile(targetDir));

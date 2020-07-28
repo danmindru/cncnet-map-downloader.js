@@ -66,7 +66,7 @@ const unzipAsync = ({ name, hash } = {}) =>
       Promise.all(
         directory.files.map(async (file) => {
           const buffer = await file.buffer();
-          const prettyFileName = `${destinationDirAbsolutePath}/${buildFileName(name, hash, file.path)}`;
+          const prettyFileName = path.resolve(destinationDirAbsolutePath, buildFileName(name, hash, file.path));
           return writeFileAsync(prettyFileName, buffer, hash);
         })
       )

@@ -1,5 +1,6 @@
 const { resolve } = require('path');
 const { readdir } = require('fs').promises;
+const { debug } = require('./constants');
 
 /**
  * Run promise chains with progress.
@@ -16,7 +17,11 @@ const runPromisesWithProgress = (promises, message = '') => {
       return res;
     });
 
-  return Promise.all(promises.map(tick));
+  return Promise.all(promises.map(tick)).catch((error) => {
+    if (debug) {
+      console.error('Failed to run promises with progress', error);
+    }
+  });
 };
 
 /**
