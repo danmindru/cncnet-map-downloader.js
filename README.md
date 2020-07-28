@@ -65,6 +65,15 @@ Uses the cncnet search endpoint to retrieve all existing maps, then requests eac
 
 Previously, scarping was considered, but not necessary at this point in time.
 
+
+### Debugging
+Run
+```
+DEBUG=true MAX_NUMBER_OF_MAPS=5 REQUEST_DELAY=5000 MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node --inspect-brk ./scripts/get-maps.js
+```
+
+And open `chrome://inspect` to debug the node process.
+
 ### Other art
 
 Check out the [cncnet search](https://mapdb.cncnet.org/search/?game=yr&search=), where you can search and download maps.

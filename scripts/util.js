@@ -11,17 +11,19 @@ const runPromisesWithProgress = (promises, message = '') => {
   let progress = 0;
 
   const tick = (promise) =>
-    promise.then((res) => {
-      progress++;
-      replaceLine(`${message} ${progress}/${promises.length}`);
-      return res;
-    });
+    promise
+      .then((res) => {
+        progress++;
+        replaceLine(`${message} ${progress}/${promises.length}`);
+        return res;
+      })
+      .catch((error) => {
+        if (debug) {
+          console.error('Failed to run promise with progress', error);
+        }
+      });
 
-  return Promise.all(promises.map(tick)).catch((error) => {
-    if (debug) {
-      console.error('Failed to run promises with progress', error);
-    }
-  });
+  return Promise.all(promises.map(tick));
 };
 
 /**

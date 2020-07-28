@@ -50,10 +50,10 @@ const moveFile = (fromPath, toPath) =>
         if (debug) {
           console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
         }
-        reject(null);
+        return reject(null);
       }
 
-      resolve(toPath);
+      return resolve(toPath);
     });
   }).catch((error) => {
     if (debug) {

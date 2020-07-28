@@ -62,7 +62,7 @@ const main = async () => {
       )
     );
 
-    if (numberOfFilesSkipped >= 0) {
+    if (numberOfFilesSkipped > 0) {
       if (numberOfFilesSkipped === mapsWithLimitApplied.length) {
         console.log(
           chalk.gray(

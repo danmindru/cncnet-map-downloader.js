@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const hasha = require('hasha');
+const md5File = require('md5-file');
 const chalk = require('chalk');
 
 const { runPromisesWithProgress, replaceLine, getRecursiveFileList } = require('./util');
@@ -40,10 +40,10 @@ const getFileSize = (targetDir) => (filePath) =>
     fs.stat(path.resolve(targetDir, filePath), (error, stats) => {
       if (error) {
         console.error(`Failed to get file size for ${filePath}`, error);
-        reject(null);
+        return reject(null);
       }
 
-      resolve({ size: stats.size, filePath });
+      return resolve({ size: stats.size, filePath });
     })
   ).catch((error) => {
     if (debug) {
@@ -60,7 +60,6 @@ const removeDuplicates = async (targetDir) => {
   const targetDirFilelist = (await getRecursiveFileList(targetDir)).filter((filePath) =>
     fs.statSync(path.resolve(targetDir, filePath)).isFile()
   );
-
   console.log(`\nComparing file sizes...`);
 
   // Get file sizes, filtering out failed fs.stats
@@ -91,14 +90,12 @@ const removeDuplicates = async (targetDir) => {
   const fileIndexesWithSameChecksum = fileIndexesWithSameSize.filter(async (key) => {
     const values = filesBySize[key];
 
-    const hashArray = await Promise.all(
-      values.map((filePath) => hasha.fromFile(path.resolve(targetDir, filePath), { algorithm: 'md5' }))
-    );
+    const hashArray = await Promise.all(values.map((filePath) => md5File(path.resolve(targetDir, filePath))));
 
     return hashArray.every((v) => v === hashArray[0]);
   });
 
-  // Remove duplicates, taking the first item of the duplicate array
+  // Remove duplicates, keeping the first item of the duplicates array
   const fileRemovalPromises = flatten(
     fileIndexesWithSameChecksum.map((key) => {
       const filesToRemove = filesBySize[key].slice(1);
