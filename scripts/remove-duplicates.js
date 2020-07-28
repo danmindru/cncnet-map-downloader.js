@@ -22,7 +22,11 @@ const removeFile = (targetDir) => (filePath) =>
 
       resolve(path.resolve(targetDir, filePath));
     })
-  );
+  ).catch((error) => {
+    if (debug) {
+      console.error('Failed to remove file', error);
+    }
+  });
 
 /**
  * Get the size of a file.
@@ -41,7 +45,11 @@ const getFileSize = (targetDir) => (filePath) =>
 
       resolve({ size: stats.size, filePath });
     })
-  );
+  ).catch((error) => {
+    if (debug) {
+      console.error('Failed to get file size', error);
+    }
+  });
 
 /**
  * Given a path, removes duplicate files by first checking size, then hash.

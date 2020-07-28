@@ -47,6 +47,10 @@ const moveFile = (fromPath, toPath) =>
 
       resolve(toPath);
     });
+  }).catch((error) => {
+    if (debug) {
+      console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
+    }
   });
 
 module.exports = {
