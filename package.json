@@ -1,10 +1,10 @@
 {
   "name": "cncnet-map-downloader.js",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Downloads all maps from cncnet",
   "main": "index.js",
   "scripts": {
-    "download": "MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
+    "download": "MAP_AGE=99999 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
     "dev": "MAX_NUMBER_OF_MAPS=5 REQUEST_DELAY=5000 MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node ./scripts/get-maps.js",
     "lint": "eslint ./**/*.js ",
     "publish:all": "node package.js"
@@ -16,9 +16,11 @@
   "keywords": [
     "cncnet",
     "yuri",
+    "yuri's revenge",
     "red",
     "alert",
-    "2",
+    "red alert 2",
+    "red alert 2 yuri's revenge",
     "yuri's",
     "revenge",
     "maps",
@@ -35,8 +37,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "chalk": "^4.1.0",
-    "hasha": "^5.2.0",
     "lodash": "^4.17.15",
+    "md5-file": "^5.0.0",
     "ora": "^4.0.5",
     "pkg": "^4.4.9",
     "request": "^2.88.2",

@@ -42,10 +42,10 @@ const writeFileAsync = (fileName, buffer, hash) =>
     fs.writeFile(filePath, buffer, function (err) {
       if (err) {
         console.error(chalk.red(`\nFailed to write file ${fileName} to ${filePath}`), err);
-        reject(hash);
+        return reject(hash);
       }
 
-      resolve(hash);
+      return resolve(hash);
     });
   }).catch((error) => {
     if (debug) {
@@ -66,7 +66,7 @@ const unzipAsync = ({ name, hash } = {}) =>
       Promise.all(
         directory.files.map(async (file) => {
           const buffer = await file.buffer();
-          const prettyFileName = `${destinationDirAbsolutePath}/${buildFileName(name, hash, file.path)}`;
+          const prettyFileName = path.resolve(destinationDirAbsolutePath, buildFileName(name, hash, file.path));
           return writeFileAsync(prettyFileName, buffer, hash);
         })
       )

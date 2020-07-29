@@ -12,6 +12,7 @@ const {
   shouldSortInDirectories,
   gameType,
   maxNumberOfMaps,
+  debug,
 } = require('./constants');
 const { downloadAndUnzipMaps } = require('./unzip-maps');
 const { removeDuplicates } = require('./remove-duplicates');
@@ -61,7 +62,7 @@ const main = async () => {
       )
     );
 
-    if (numberOfFilesSkipped >= 0) {
+    if (numberOfFilesSkipped > 0) {
       if (numberOfFilesSkipped === mapsWithLimitApplied.length) {
         console.log(
           chalk.gray(
@@ -89,7 +90,9 @@ const main = async () => {
 
   spinner.stop();
 
-  console.clear(); // Clear previous output.
+  if (!debug) {
+    console.clear(); // Clear previous output.
+  }
   console.log(`\nDone. Here's the executive summary:
     -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
     -  ${

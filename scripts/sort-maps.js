@@ -10,6 +10,8 @@ const { debug } = require('./constants');
  * @param {string} targetDir Target directory to sort files in.
  */
 const sortMaps = async (targetDir) => {
+  console.log(`\nSorting maps...`);
+
   const targetDirFilelist = fs
     .readdirSync(targetDir)
     .filter((filePath) => fs.statSync(path.resolve(targetDir, filePath)).isFile());
@@ -35,6 +37,12 @@ const sortMaps = async (targetDir) => {
   });
 };
 
+/**
+ * Moves a file from a path to another
+ *
+ * @param {string} fromPath
+ * @param {string} toPath
+ */
 const moveFile = (fromPath, toPath) =>
   new Promise((resolve, reject) => {
     fs.rename(fromPath, toPath, (error) => {
@@ -42,11 +50,15 @@ const moveFile = (fromPath, toPath) =>
         if (debug) {
           console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
         }
-        reject(null);
+        return reject(null);
       }
 
-      resolve(toPath);
+      return resolve(toPath);
     });
+  }).catch((error) => {
+    if (debug) {
+      console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
+    }
   });
 
 module.exports = {
