@@ -6,27 +6,7 @@ const chalk = require('chalk');
 const { runPromisesWithProgress, replaceLine, getRecursiveFileList } = require('./util');
 const { flatten } = require('lodash');
 const { getConfig } = require('./configuration');
-
-/**
- * Remove a file.
- *
- * @param { string } targetDir
- */
-const removeFile = (targetDir) => (filePath) =>
-  new Promise((resolve, reject) =>
-    fs.unlink(path.resolve(targetDir, filePath), (error) => {
-      if (error) {
-        console.error(`Failed to remove ${filePath}`, error);
-        reject(null);
-      }
-
-      resolve(path.resolve(targetDir, filePath));
-    })
-  ).catch((error) => {
-    if (getConfig().debug) {
-      console.error(`Failed to remove ${filePath}`, error);
-    }
-  });
+const { removeFile } = require('./util');
 
 /**
  * Get the size of a file.
