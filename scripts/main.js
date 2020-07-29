@@ -7,6 +7,7 @@ const { getConfig, setConfigProperty } = require('./configuration');
 const { getMaps } = require('./get-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 const { sortMaps } = require('./sort-maps');
+const { unsortMaps } = require('./unsort-maps');
 
 /**
  * Main entry point.
@@ -64,7 +65,9 @@ const main = async () => {
     setConfigProperty('shouldSortInDirectories', shouldSortInDirectories);
     setConfigProperty('gameType', gameType);
     setConfigProperty('destinationDir', destinationDir);
-    setConfigProperty('maxNumberOfMaps', maxNumberOfMaps);
+    if (maxNumberOfMaps) {
+      setConfigProperty('maxNumberOfMaps', maxNumberOfMaps);
+    }
   }
 
   const { destinationDirAbsolutePath, destinationDir, shouldSortInDirectories, debug } = getConfig();
@@ -87,6 +90,9 @@ const main = async () => {
   if (shouldSortInDirectories) {
     spinner.text = 'Sorting maps';
     await sortMaps(destinationDirAbsolutePath);
+  } else {
+    spinner.text = 'Un-sorting maps';
+    await unsortMaps(destinationDirAbsolutePath);
   }
 
   spinner.stop();

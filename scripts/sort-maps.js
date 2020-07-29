@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { getConfig } = require('./configuration');
+const { moveFile } = require('./util');
 
 /**
  * Given a path, sorts files in directories by their first letter.
@@ -36,30 +37,6 @@ const sortMaps = async (targetDir) => {
     }
   });
 };
-
-/**
- * Moves a file from a path to another
- *
- * @param {string} fromPath
- * @param {string} toPath
- */
-const moveFile = (fromPath, toPath) =>
-  new Promise((resolve, reject) => {
-    fs.rename(fromPath, toPath, (error) => {
-      if (error) {
-        if (getConfig().debug) {
-          console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
-        }
-        return reject(null);
-      }
-
-      return resolve(toPath);
-    });
-  }).catch((error) => {
-    if (getConfig().debug) {
-      console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
-    }
-  });
 
 module.exports = {
   sortMaps,

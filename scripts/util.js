@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const { resolve } = require('path');
 const { readdir } = require('fs').promises;
 const { getConfig } = require('./configuration');
@@ -63,9 +65,34 @@ const getRecursiveFileList = async (targetDir) => {
   return Array.prototype.concat(...files);
 };
 
+/**
+ * Moves a file from a path to another
+ *
+ * @param {string} fromPath
+ * @param {string} toPath
+ */
+const moveFile = (fromPath, toPath) =>
+  new Promise((resolve, reject) => {
+    fs.rename(fromPath, toPath, (error) => {
+      if (error) {
+        if (getConfig().debug) {
+          console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
+        }
+        return reject(null);
+      }
+
+      return resolve(toPath);
+    });
+  }).catch((error) => {
+    if (getConfig().debug) {
+      console.error(`Failed to rename file from ${fromPath} to ${toPath}`, error);
+    }
+  });
+
 module.exports = {
   runPromisesWithProgress,
   replaceLine,
   replaceOraLine,
   getRecursiveFileList,
+  moveFile,
 };
