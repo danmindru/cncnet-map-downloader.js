@@ -2,7 +2,7 @@ const { exec } = require('pkg');
 const { name, version } = require('./package.json');
 const fs = require('fs');
 const packageDir = './packages';
-const entry = './scripts/get-maps.js';
+const entry = './scripts/main.js';
 const targets = ['node12-linux-x64', 'node12-macos-x64', 'node12-win-x64'];
 const baseName = `${name}-${version}`.replace(/\./g, '-');
 

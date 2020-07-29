@@ -37,19 +37,19 @@ You can configure the downloader through enviornment variables.
 - Get all Yuri's Revenge / Red Alert 2 maps in a custom directory
 
 ```bash
-DESTINATION_DIR=my-yuri-maps ./cncnet-map-downloader-js-1-1-1-macos
+DESTINATION_DIR=my-yuri-maps ./cncnet-map-downloader-js-x-x-x-macos
 ```
 
 - Get all Red alert maps
 
 ```bash
-GAME_TYPE=ra ./cncnet-map-downloader-js-1-1-1-macos
+GAME_TYPE=ra ./cncnet-map-downloader-js-x-x-x-macos
 ```
 
 - Get all Tiberian Sun maps, not older than 1 year
 
 ```bash
-GAME_TYPE=ts MAP_AGE=12 ./cncnet-map-downloader-js-1-1-1-macos
+GAME_TYPE=ts MAP_AGE=12 ./cncnet-map-downloader-js-x-x-x-macos
 ```
 
 ##### Dev config
@@ -70,7 +70,7 @@ Previously, scarping was considered, but not necessary at this point in time.
 Run
 
 ```
-DEBUG=true MAX_NUMBER_OF_MAPS=5 REQUEST_DELAY=5000 MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node --inspect-brk ./scripts/get-maps.js
+DEBUG=true MAX_NUMBER_OF_MAPS=5 REQUEST_DELAY=5000 MAP_AGE=1 RUN_UNPACKAGED=true GAME_TYPE=yr DESTINATION_DIR=./cncnet-yuri-maps node --inspect-brk ./scripts/main.js
 ```
 
 And open `chrome://inspect` to debug the node process.
