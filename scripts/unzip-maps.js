@@ -5,7 +5,7 @@ const unzipper = require('unzipper');
 const request = require('request');
 const chalk = require('chalk');
 
-const { debug, cwd, destinationDirAbsolutePath, gameType, delayBetweenRequests } = require('./constants');
+const { getConfig } = require('./configuration');
 const { replaceLine, replaceOraLine } = require('./util');
 
 /**
@@ -34,6 +34,8 @@ const buildFileName = (name, hash, filePath) =>
  */
 const writeFileAsync = (fileName, buffer, hash) =>
   new Promise((resolve, reject) => {
+    const { debug, cwd } = getConfig();
+
     const filePath = path.resolve(cwd, fileName);
     if (debug) {
       console.log(`\nWriting ${fileName} to ${filePath}`);
@@ -48,7 +50,7 @@ const writeFileAsync = (fileName, buffer, hash) =>
       return resolve(hash);
     });
   }).catch((error) => {
-    if (debug) {
+    if (getConfig().debug) {
       console.error('Failed to write file', error);
     }
   });
@@ -60,7 +62,9 @@ const writeFileAsync = (fileName, buffer, hash) =>
  *
  * @return { string } hash of unzipped file (or file that errored during unzip).
  */
-const unzipAsync = ({ name, hash } = {}) =>
+const unzipAsync = ({ name, hash } = {}) => {
+  const { destinationDirAbsolutePath, gameType } = getConfig();
+
   unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
     .then(async (directory) =>
       Promise.all(
@@ -75,6 +79,7 @@ const unzipAsync = ({ name, hash } = {}) =>
       console.error(chalk.red(`\nFailed to download & unzip file ${name} (hash: ${hash})`, error));
       throw hash;
     });
+};
 
 /**
  * Downloads & Unzips a list of map objects.
@@ -89,6 +94,7 @@ const unzipAsync = ({ name, hash } = {}) =>
 const downloadAndUnzipMaps = async (mapObjects, numberOfFilesSkipped, spinner) => {
   const filesErrored = [];
   const filesWrote = [];
+  const { debug, delayBetweenRequests } = getConfig();
 
   // Run promises in sequence with a delay, to not upset our cncnet friends.
   for (const mapObject of mapObjects) {

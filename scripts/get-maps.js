@@ -1,38 +1,19 @@
 const axios = require('axios');
-const fs = require('fs');
 const chalk = require('chalk');
-const ora = require('ora');
 
 const { differenceWith } = require('lodash');
-const {
-  destinationDir,
-  destinationDirAbsolutePath,
-  mapAge,
-  shouldScrape,
-  shouldSortInDirectories,
-  gameType,
-  maxNumberOfMaps,
-  debug,
-} = require('./constants');
+const { getConfig } = require('./configuration');
 const { downloadAndUnzipMaps } = require('./unzip-maps');
-const { removeDuplicates } = require('./remove-duplicates');
-const { sortMaps } = require('./sort-maps');
 const { getRecursiveFileList } = require('./util');
 
-if (!fs.existsSync(destinationDirAbsolutePath)) {
-  fs.mkdirSync(destinationDirAbsolutePath);
-  process.stdout.write(
-    chalk.gray(`Destination dir does not exist. Creating ${destinationDir} in ${destinationDirAbsolutePath}`)
-  );
-} else {
-  process.stdout.write(chalk.gray(`Using existing destination dir: ${destinationDir}`));
-}
-
 /**
- * Lists all maps then downloads them & unzips into the dir of choice.
- * A delay between requests is made to be nice :-)
+ * Gets maps from available search urls, alternatively scarping if no api exists.
+ *
+ * @param { Object } [spinner] Ora spinner instance used to display progress.
  */
-const main = async () => {
+const getMaps = async (spinner) => {
+  const { destinationDirAbsolutePath, mapAge, shouldScrape, gameType, maxNumberOfMaps } = getConfig();
+
   const searchUrl = mapAge
     ? `https://mapdb.cncnet.org/search-json.php?game=${gameType}&age=${mapAge}`
     : `https://mapdb.cncnet.org/search-json.php?game=${gameType}`;
@@ -41,10 +22,8 @@ const main = async () => {
     console.warn(chalk.yellow('Scraping not implemented. Using cncnet search-json url to list all maps.'));
   }
 
-  console.clear(); // Clear previous output.
   console.log(`\nGettings maps from ${chalk.underline(searchUrl)}...`);
 
-  const spinner = ora({ text: 'Getting maps', spinner: 'material' });
   const { filesWrote, filesErrored, numberOfFilesSkipped } = await axios.get(searchUrl).then(async (res) => {
     const destinationDirFilelist = await getRecursiveFileList(destinationDirAbsolutePath);
     const mapsWithLimitApplied =
@@ -76,41 +55,19 @@ const main = async () => {
       }
     }
 
-    spinner.start();
+    if (spinner) {
+      spinner.start();
+    }
     return downloadAndUnzipMaps(newMaps, numberOfFilesSkipped, spinner);
   });
 
-  spinner.text = 'Removing duplicates';
-  const filesDedupedNumber = await removeDuplicates(destinationDirAbsolutePath);
-
-  if (shouldSortInDirectories) {
-    spinner.text = 'Sorting maps';
-    await sortMaps(destinationDirAbsolutePath);
-  }
-
-  spinner.stop();
-
-  if (!debug) {
-    console.clear(); // Clear previous output.
-  }
-  console.log(`\nDone. Here's the executive summary:
-    -  ${chalk.green(`Downloaded & unzipped: ${chalk.bold(filesWrote.length)}`)}
-    -  ${
-      filesErrored.length
-        ? chalk.red(`Failed to download: ${chalk.bold(filesErrored.length)}`)
-        : chalk.green('All downloads successful.')
-    }
-    -  ${
-      numberOfFilesSkipped
-        ? chalk.yellow(`Skipped ${numberOfFilesSkipped} files that were previously downloaded.`)
-        : 'No files skipped.'
-    }
-    -  ${
-      filesDedupedNumber
-        ? chalk.yellow(`Removed ${filesDedupedNumber} files that appeared to be duplicates.`)
-        : 'No duplicates found.'
-    }
-    `);
+  return {
+    filesWrote,
+    filesErrored,
+    numberOfFilesSkipped,
+  };
 };
 
-main();
+module.exports = {
+  getMaps,
+};

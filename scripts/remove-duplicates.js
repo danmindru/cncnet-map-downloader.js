@@ -5,7 +5,7 @@ const chalk = require('chalk');
 
 const { runPromisesWithProgress, replaceLine, getRecursiveFileList } = require('./util');
 const { flatten } = require('lodash');
-const { debug } = require('./constants');
+const { getConfig } = require('./configuration');
 
 /**
  * Remove a file.
@@ -23,7 +23,7 @@ const removeFile = (targetDir) => (filePath) =>
       resolve(path.resolve(targetDir, filePath));
     })
   ).catch((error) => {
-    if (debug) {
+    if (getConfig().debug) {
       console.error(`Failed to remove ${filePath}`, error);
     }
   });
@@ -46,7 +46,7 @@ const getFileSize = (targetDir) => (filePath) =>
       return resolve({ size: stats.size, filePath });
     })
   ).catch((error) => {
-    if (debug) {
+    if (getConfig().debug) {
       console.error('Failed to get file size', error);
     }
   });
@@ -100,7 +100,7 @@ const removeDuplicates = async (targetDir) => {
     fileIndexesWithSameChecksum.map((key) => {
       const filesToRemove = filesBySize[key].slice(1);
 
-      if (debug) {
+      if (getConfig().debug) {
         console.debug(chalk.green(`\nFound map duplicates for file: ${filesBySize[key][0]}. Will keep only 1 map.`));
         console.debug(chalk.yellow(`Will remove duplicates: ${filesToRemove.map((f) => `\n - ${chalk.bold(f)}`)}`));
       }
