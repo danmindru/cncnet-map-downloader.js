@@ -1,3 +1,4 @@
+const path = require('path');
 const fs = require('fs');
 
 const { resolve } = require('path');
@@ -66,6 +67,17 @@ const getRecursiveFileList = async (targetDir) => {
 };
 
 /**
+ * Checks if a file exists.
+ *
+ * @param {string} filePath
+ */
+const doesFileExist = async (filePath) =>
+  fs.promises
+    .access(filePath, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false);
+
+/**
  * Moves a file from a path to another
  *
  * @param {string} fromPath
@@ -89,10 +101,55 @@ const moveFile = (fromPath, toPath) =>
     }
   });
 
+/**
+ * Remove a file.
+ *
+ * @param { string } targetDir
+ */
+const removeFile = (targetDir) => (filePath) =>
+  new Promise((resolve, reject) =>
+    fs.unlink(path.resolve(targetDir, filePath), (error) => {
+      if (error) {
+        console.error(`Failed to remove ${filePath}`, error);
+        reject(null);
+      }
+
+      resolve(path.resolve(targetDir, filePath));
+    })
+  ).catch((error) => {
+    if (getConfig().debug) {
+      console.error(`Failed to remove ${filePath}`, error);
+    }
+  });
+
+/**
+ * Remove a directory.
+ *
+ * @param { string } targetDir
+ */
+const removeDirectory = (targetDir) => (dirPath) =>
+  new Promise((resolve, reject) =>
+    fs.rmdir(path.resolve(targetDir, dirPath), (error) => {
+      if (error) {
+        console.error(`Failed to remove ${dirPath}`, error);
+        reject(null);
+      }
+
+      resolve(path.resolve(targetDir, dirPath));
+    })
+  ).catch((error) => {
+    if (getConfig().debug) {
+      console.error(`Failed to remove ${dirPath}`, error);
+    }
+  });
+
 module.exports = {
   runPromisesWithProgress,
   replaceLine,
   replaceOraLine,
   getRecursiveFileList,
   moveFile,
+  removeFile,
+  removeDirectory,
+  doesFileExist,
 };

@@ -13,10 +13,16 @@ const { moveFile } = require('./util');
 const sortMaps = async (targetDir) => {
   console.log(`\nSorting maps...`);
 
-  const targetDirFilelist = fs
-    .readdirSync(targetDir)
-    .filter((filePath) => fs.statSync(path.resolve(targetDir, filePath)).isFile());
-
+  const targetDirFilelist = fs.readdirSync(targetDir).filter((filePath) => {
+    try {
+      return fs.statSync(path.resolve(targetDir, filePath)).isFile();
+    } catch (error) {
+      if (getConfig().debug) {
+        console.error('Failed to stat file', error);
+      }
+      return false;
+    }
+  });
   targetDirFilelist.map(async (filePath) => {
     const firstChar = filePath.slice(0, 1).toLowerCase();
     const isAlphaNumeric = firstChar.match(/^[a-zA-Z0-9]/gm);

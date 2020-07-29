@@ -12,11 +12,18 @@ const { getRecursiveFileList, moveFile } = require('./util');
 const unsortMaps = async (targetDir) => {
   console.log(`\nUn-sorting maps...`);
 
-  const targetDirFilelist = (await getRecursiveFileList(targetDir)).filter((filePath) =>
-    fs.statSync(path.resolve(targetDir, filePath)).isFile()
-  );
+  const targetDirFilelist = (await getRecursiveFileList(targetDir)).filter((filePath) => {
+    try {
+      return fs.statSync(path.resolve(targetDir, filePath)).isFile();
+    } catch (error) {
+      if (getConfig().debug) {
+        console.error('Failed to stat file', error);
+      }
+      return false;
+    }
+  });
 
-  targetDirFilelist.map(async (filePath) => {
+  return targetDirFilelist.map(async (filePath) => {
     try {
       const fileName = filePath.slice(filePath.lastIndexOf('/') + 1);
 

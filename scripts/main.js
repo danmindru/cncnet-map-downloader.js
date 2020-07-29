@@ -8,6 +8,7 @@ const { getMaps } = require('./get-maps');
 const { removeDuplicates } = require('./remove-duplicates');
 const { sortMaps } = require('./sort-maps');
 const { unsortMaps } = require('./unsort-maps');
+const { deleteEmptyDirectories } = require('./delete-empty-directories');
 
 /**
  * Main entry point.
@@ -94,6 +95,8 @@ const main = async () => {
     spinner.text = 'Un-sorting maps';
     await unsortMaps(destinationDirAbsolutePath);
   }
+
+  await deleteEmptyDirectories(destinationDirAbsolutePath);
 
   spinner.stop();
 
