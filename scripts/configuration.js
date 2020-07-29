@@ -40,6 +40,11 @@ const getConfig = () => {
  */
 const setConfigProperty = (property, value) => {
   config = { ...config, [property]: value };
+
+  if (property === 'destinationDir') {
+    config = { ...config, destinationDirAbsolutePath: path.resolve(cwd, value) };
+  }
+
   return config;
 };
 
