@@ -1,6 +1,6 @@
 [![npm](https://img.shields.io/npm/v/cncnet-map-downloader.js.svg)](https://www.npmjs.com/package/cncnet-map-downloader.js)
 
-# cncnet-map-downloader.js
+# cncnet-map-downloader.js ⬇️💻
 
 Downloads all maps from [cncnet.org](https://cncnet.org) into a directory of your choice.
 
@@ -8,16 +8,20 @@ Downloads all maps from [cncnet.org](https://cncnet.org) into a directory of you
 
 Grab the latest binary release on [the release page](https://github.com/danmindru/cncnet-map-downloader.js/releases) 💽.
 
-Double-click your favorite executable (win, mac, linux).
+Double-click your favorite executable or run the executable through the command line. You will be guided through the options (see demo).
 
 - By default, it only downloads Yuri (yr) maps, but can be configured to download other types. See config below.
 - If the process is somehow killed, it will resume downloading maps that haven't been downloaded yet (skips previously downlaoded maps).
 - It sorts maps in directories by name (alpha numeric).
 - It checks for duplicate maps (size, id, sha).
 
+### Demo
+
+![cncnet-map-downloader linux](https://user-images.githubusercontent.com/1515742/88851006-6ed28980-d1ec-11ea-857e-e6e5b0ec0e2c.gif)
+
 | Windows preview                                                                                                                 | Mac preview                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| <img src="https://user-images.githubusercontent.com/1515742/62007911-7d0e4580-b153-11e9-9417-1ea40231db6a.jpg" width="500px" /> | <img src="https://user-images.githubusercontent.com/1515742/62007905-623bd100-b153-11e9-93c9-3b388a7c8170.png" width="500px" /> |
+| <img src="https://user-images.githubusercontent.com/1515742/88851026-75610100-d1ec-11ea-9a7f-5c1eaedc7ee8.gif" width="500px" /> | <img src="https://user-images.githubusercontent.com/1515742/88851022-74c86a80-d1ec-11ea-95dd-7961906351c7.gif" width="500px" /> |
 
 #### Build it yourself
 
