@@ -17,7 +17,7 @@ const main = async () => {
     {
       type: 'confirm',
       name: 'shouldConfigure',
-      message: `Would you like to configure some options first? No will start downloading using defaults.`,
+      message: `Would you like to configure some options first? 'No' will start downloading using defaults.`,
     },
   ]);
 
