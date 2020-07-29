@@ -65,7 +65,7 @@ const writeFileAsync = (fileName, buffer, hash) =>
 const unzipAsync = ({ name, hash } = {}) => {
   const { destinationDirAbsolutePath, gameType } = getConfig();
 
-  unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
+  return unzipper.Open.url(request, `http://mapdb.cncnet.org/${gameType}/${hash}.zip`)
     .then(async (directory) =>
       Promise.all(
         directory.files.map(async (file) => {
