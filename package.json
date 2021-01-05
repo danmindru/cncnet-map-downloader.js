@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/danmindru/cncnet-map-downloader.js#readme",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "chalk": "^4.1.0",
     "lodash": "^4.17.15",
     "md5-file": "^5.0.0",
